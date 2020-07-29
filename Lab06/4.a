@@ -1,0 +1,35 @@
+#esercizio 4
+.data
+	wVett: .word 15, 870, 1200, -21, -1000, 15003, -1039581
+.text
+.globl main
+.ent main
+main:
+	la $a0,wVett
+	li $a1,7
+	jal massimo
+	move $a0,$v0
+	li $v0,1
+	syscall
+	li $v0,10
+	syscall
+.end main
+
+massimo:
+	li $t0,1 #contatore
+	lw $t1,($a0) #carico primo numero come max
+	addi $a0,$a0,4
+ciclo:
+	lw $t2,($a0)
+	blt $t2,$t1,next
+	move $t3,$t2
+	move $t2,$t1
+	move $t1,$t3   #swap
+next:
+	addi $a0,$a0,4
+	addi $t0,$t0,1
+	bne $t0,$a1,ciclo
+	move $v0,$t1
+	jr $ra
+.end massimo
+	
