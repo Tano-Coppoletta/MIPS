@@ -1,0 +1,65 @@
+#esercizio 8.4
+.data
+	DIM=5
+	vet1: .word 56, 12, 98, 129, 58
+	vet2: .word 1, 0, 245, 129, 12
+	risultato: .space DIM
+.text
+.globl main
+.ent main
+main:
+	subu $sp,$sp,4
+	sw $ra,($sp)
+	
+	la $a0,vet1
+	la $a1,vet2
+	la $a2,risultato
+	li $a3,DIM
+	jal calcoloDistanza
+	li $t0,0
+	la $t1,risultato
+	
+	lw $ra,($sp)
+	addi $sp,$sp,4
+	jr $ra
+.end main
+
+.ent calcoloDistanza
+calcoloDistanza:
+	li $t0,0 #contatore
+cicloM:
+	beq $t0,$a3,fine
+calcoloH:
+	lw $t7,($a0)
+	lw $t8,($a1)
+	xor $t6,$t7,$t8
+	li $t1,0 #contatore 1
+	li $t2,0 #contatore ciclo
+	li $t3,1 #maschera
+cicloH:
+	and $t4,$t6,$t3
+	beqz $t4,next
+	addi $t1,$t1,1
+next:
+	sll $t3,$t3,1
+	addi $t2,$t2,1
+	bne $t2,32,cicloH
+	add $t0,$t0,1
+	sb $t1,($a2)
+	add $a2,$a2,1
+	add $a0,$a0,4
+	add $a1,$a1,4
+	j cicloM
+fine: 
+	jr $ra
+.end calcoloDistanza
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

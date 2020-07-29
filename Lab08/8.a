@@ -1,0 +1,184 @@
+#esercizio 8.8
+.data
+	RIGHE = 9
+	COLONNE = 9
+	DIM = RIGHE * COLONNE
+	ITERAZIONI = 14
+	matrice1: .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+		      .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+			  .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+			  .byte 0, 0, 0, 0, 1, 0, 0, 0, 0
+			  .byte 0, 0, 0, 1, 1, 1, 0, 0, 0
+			  .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+			  .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+			  .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+			  .byte 0, 0, 0, 0, 0, 0, 0, 0, 0
+	matrice2: .space DIM
+.text
+.globl main
+.ent main
+main:
+	subu $sp,$sp,4
+	sw $ra,($sp)
+	li $t0,0 #contatore
+ciclo:
+	beq $t0,ITERAZIONI,fine
+	add $t0,$t0,1
+	subu $sp,$sp,4
+	sw $t0,($sp) #salvo $t0 nello stack
+	la $a0,matrice1
+	la $a1,matrice2
+	li $a2,RIGHE
+	li $a3,COLONNE
+	jal evoluzione
+	lw $t0,($sp)
+	add $sp,$sp,4
+	j ciclo
+fine:
+	lw $ra,($sp)
+	addi $sp,$sp,4
+	jr $ra
+.end main
+
+evoluzione:
+	mul $t0,$a2,$a3 #RIGHE*COLONNE
+	li $t1,0 #contatore
+	#salvo nello stack i parametri
+	subu $fp,$sp,4 #salvo $fp
+	subu $sp,$sp,4
+	sw $ra,($sp)
+	move $t2,$a0 #salvo indirizzo iniziale matrice
+	move $t3,$a1
+cicloE:
+	beq $t1,$t0,fineI
+	subu $sp,$sp,32
+	sw $t0,($sp)
+	sw $t1,4($sp)
+	sw $t2,8($sp)
+	sw $t3,12($sp)
+	sw $a0,16($sp)
+	sw $a1,20($sp)
+	sw $a2,24($sp)
+	sw $a3,28($sp)
+	move $a1,$t1
+	move $a0,$t2
+	move $a1,$t3
+	jal contaVicini
+	lw $t0,($sp)
+	lw $t1,4($sp)
+	lw $a0,8($sp)
+	lw $a1,12($sp)
+	lw $a2,16($sp)
+	lw $a3,20($sp)
+	add $sp,$sp,24
+	lb $t2,($a0) #carico valore
+	beq $t2,$0,morta
+	blt $v0,2,isolamento #meno di 2 muore
+	bgt $v0,3,sovrappopolazione
+	li $t7,1
+	sb $t7,($a1)
+	j next
+morta:
+	bne $v0,3,cicloE
+	li $t7,1
+	sb $t7,($a1)
+	j next
+isolamento:
+	li $t7,1
+	sb $t7,($a1)
+	j next
+sovrappopolazione:
+	li $t7,1
+	sb $t7,($a1)
+next:
+	add $a1,$a1,1
+	add $a0,$a0,1
+	add $t1,$t1,1
+	j cicloE
+fineI:
+	subu $sp,$sp,8
+	sw $t2,($sp)
+	sw $t3,4($sp)
+	move $a0,$t3 #matrice2
+	move $a1,$a2
+	move $a2,$a3
+	jal stampaMatrice
+	lw $a0,4($sp)
+	lw $a1,($sp)
+	add $sp,$sp,8
+	lw $ra,($sp)
+	add $sp,$sp,4
+	jr $ra
+.end evoluzione
+
+.ent stampaMatrice
+stampaMatrice:
+	li $t0,0 #contatore riga
+	move $t2,$a0
+cicloEst:
+	li $t1,0 #contatore colonna
+cicloInt:
+	add $t1,$t1,1
+	li $v0,1
+	lb $a0,($t2)
+	syscall
+	add $t2,$t2,1
+	bne $t1,$a2,cicloInt
+	li $a0,'\n'
+	li $v0,1
+	syscall
+	add $t0,$t0,1
+	bne $t0,$a1,cicloEst
+	jr $ra
+.end stampaMatrice
+	
+
+
+
+.ent contaVicini
+contaVicini:
+	divu $a1,$a3
+	mflo $t0 #indice riga
+	mfhi $t1 #indice colonna
+	move $v0,$0 #accumulatore
+	#$t2=rigaSopra $t3=rigaSotto $t4=colonnaSX $t5=colonnaDX
+	addi $t2,$t0,-1 #riga sopra
+	bne $t2,-1,indiceRigaSotto
+	move $t2,$0
+indiceRigaSotto:
+	addi $t3,$t0,1
+	bne $t3,$a2,indiceColonnaSX
+	sub $t3,$t3,1
+indiceColonnaSX:
+	addi $t4,$t1,-1
+	bne $t4,-1,indiceColonnaDX  #colonnaSX
+	move $t4,$0
+indiceColonnaDX:
+	addi $t5,$t1,1
+	bne $t5,$a3,indiciCelle #colonnaDX
+	sub $t5,$t5,1
+indiciCelle:
+	mul $t6,$t2,$a3
+	add $t0,$t6,$t4  #indice elemento a sinistra riga sopra
+	add $t1,$t6,$t5 #indice elemento a destra riga sopra
+	mul $t2,$t3,$a3 
+	add $t2,$t2,$t4 #indice elemento a sinistra nella riga sotto
+	add $t0,$a0,$t0 #somma indirizzo iniziale matrice
+	add $t1,$t1,$a0
+	add $t2,$t2,$a0
+	add $a1,$a1,$a0 #posizione elemento da saltare
+cicloEsterno:
+	move $t3,$t0
+cicloInterno:
+	beq $t3,$a1,saltaElemento
+	lb $t4,($t3)
+	add $v0,$v0,$t4
+saltaElemento:
+	add $t3,$t3,1
+	bleu $t3,$t1,cicloInterno
+	add $t0,$t0,$a3
+	add $t1,$t1,$a3
+	bleu $t0,$t2,cicloEsterno
+	jr $ra
+.end contaVicini
+	

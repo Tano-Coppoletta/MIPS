@@ -1,0 +1,64 @@
+#esercizio 8.2
+.data
+	anni: .word 1945, 2008, 1800, 2006, 1748, 1600
+	risultato: .byte 0, 0, 0, 0, 0, 0
+	DIM=6
+.text
+.globl main
+.ent main
+main:
+	subu $sp,$sp,4
+	sw $ra,($sp)
+	
+	la $a0,anni
+	la $a1,risultato
+	li $a2,DIM
+	jal bisestile
+	
+	li $t1,DIM
+	la $t2,risultato
+cicloStampa:
+	li $v0,1
+	lbu $a0,($t2)
+	syscall
+	addi $t2,$t2,1
+	subu $t1,$t1,0
+	bnez $t1,cicloStampa
+	
+	lw $ra,($sp)
+	addi $sp,$sp,4
+	jr $ra
+.end main
+
+.ent bisestile
+bisestile:
+	li $t0,0 #contatore
+ciclo:
+	lw $t1,($a0) #prendo anno
+	li $t2,100
+	divu $t1,$t2
+	mfhi $t2   #controllo resto divisione per 100
+	bne $t2,$0,next #se il resto è zero controllo /400
+	li $t2,400
+	divu $t1,$t2
+	mfhi $t2
+	bne $t2,$0,noBise
+	li $t2,1
+	sb $t2,($a1)
+	j noBise
+next:
+	li $t2,4
+	divu $t1,$t2
+	mfhi $t2
+	bne $t2,$0,noBise
+	li $t2,1
+	sb $t2,($a1)
+noBise:
+	addi $t0,$t0,1
+	addi $a0,$a0,4
+	addi $a1,$a1,1
+	bne $t0,$a2,ciclo
+	jr $ra
+.end bisestile
+	
+	

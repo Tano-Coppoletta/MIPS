@@ -1,0 +1,66 @@
+#esercizio 8.5
+.data
+	DIM=3
+	DIM_RIGA=DIM*4
+	mat1: .word 4, -45, 15565, 6458, 4531, 124, -548, 2124, 31000
+	mat2: .word 6, -5421, -547, -99, 4531, 1456, 4592, 118, 31999
+	indice: .word 2
+	vet_out: .space DIM_RIGA
+.text
+.globl main
+.ent main
+main:
+	subu $sp,$sp,4
+	sw $ra,($sp)
+	
+	la $a0,mat1
+	la $a1,mat2
+	la $a2,vet_out
+	li $a3,DIM
+	lw $t0,indice
+	subu $sp,$sp,4
+	sw $t0,($sp)
+	jal Variazione
+	add $sp,$sp,4
+	li $t0,0
+	la $t1,vet_out
+	
+	lw $ra,($sp)
+	add $sp,$sp,4
+	jr $ra
+.end main
+
+.ent Variazione
+Variazione:
+	subu $fp,$sp,4 #salvo fp
+	lw $t0,4($fp) #indice
+	#calcolo indice per riga l
+	mul $t1,$t0,$a3 #indice*DIM
+	sll $t1,$t1,2 #indice*DIM*4
+	add $t1,$t1,$a0 #inidirizzo primo elemento su mat1
+	#calcolo primo indice colonna
+	sll $t3,$t0,2  #indice*4
+	add $t2,$a1,$t3 #primo elemento su mat2
+	li $t3,0 #contatore
+	li $t4,100
+	sll $t5,$a3,2 #dim*4
+ciclo:
+	lw $t7,($t1) #var1
+	lw $t8,($t2) #var2
+	sub $t8,$t7,$t8 #val2-val1
+	mul $t8,$t8,$t4
+	div $t8,$t7 #variazione
+	mflo $t8
+	sw $t8,($a2) #store risultato
+	add $a2,$a2,4 #aggiorno indirizzo vett risultato
+	add $t3,$t3,1 #aggiorno contatore
+	add $t1,$t1,4 #aggiorno indirizzo mat1
+	add $t2,$t2,$t5 #aggiorno indirizzo mat2
+	bne $t3,$a3,ciclo
+	jr $ra
+.end Variazione
+	
+	
+
+	
+	
