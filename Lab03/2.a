@@ -1,0 +1,53 @@
+#esercizio 3.2
+.data
+	messageInput: .asciiz "inserisci numero: "
+	messageError: .asciiz "\nL input non è un numero valido."
+	messageEmpty: .asciiz "non è stato inserito nessun numero"
+	messageOutput: .asciiz "\nnumero troppo grande"
+.text
+.globl main
+.ent main
+main:
+	la $a0,messageInput
+	li $v0,4
+	syscall
+	move $t0,$0;#contatore numero caratteri letto
+	move $t1,$0 #accumulatore
+	addi $t3,$0,10 #metto 10 in t3
+loop: 
+	li $v0,12 #lettura di un carattere
+	syscall
+	beq $v0,'\n',exitLoop
+	blt $v0,'0',notANumber
+	bgt $v0,'9',notANumber
+	addi $t0,$t0,1
+	move $t2,$v0
+	sub $t2,$t2,'0'
+	mul $t1,$t1,$t3
+	add $t1,$t1,$t2
+	bgt $t1,0xFFFFFFFF,Output
+	b loop
+
+exitLoop:
+	beq $t0,0,noInput
+	la $a0,($t1)
+	li $v0,1
+	b printMessage
+noInput:
+	la $a0,messageEmpty
+	li $v0,4
+	b printMessage
+notANumber:
+	la $a0,messageError
+	li $v0,4
+	b printMessage
+Output:
+	la $a0,messageOutput
+	li $v0,4
+	b printMessage
+printMessage:
+	syscall
+	li $v0,10
+	syscall
+.end main
+	
