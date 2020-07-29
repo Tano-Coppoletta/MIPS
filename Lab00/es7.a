@@ -1,0 +1,68 @@
+#esercizio 7
+.data
+	message_in: .asciiz "inserire caratteri\n"
+	message_out: .asciiz "caratteri inseriti\n"
+	DIM=4
+	wVett: .space 4
+.text
+.globl main
+
+main:
+	la $a0,message_in
+	li $v0,4
+	syscall #stampo message_in
+	
+	#inizializzazione
+	la $t0,wVett
+	li $t1,0
+input: beq $t1,DIM,done
+	li $v0,5
+	syscall #acquisisco carattere
+	sw $v0,($t0)
+	addi $t0,$t0,1
+	addi $t1,$t1,1
+	j input
+	
+done:
+la $t0,wVett
+li $t1,1
+lb $t3,($t0) #salvo il primo elemento
+addi $t0,$t0,1 #salvo l'indirizzo del secondo elemento
+minimo: beq $t1,DIM,stampa
+	slt $t4,$t3,$t0#if(t3<(t0))
+	beq $t4,$0,min1 #else
+	lb $t4,($t3)
+	j min2
+	
+ min1:lb $t2,($t0)
+	addi $t0,$t0,1
+	addi $t1,$t1,1
+	j minimo
+	
+ min2:
+	addi $t0,$t0,1
+	addi $t1,$t1,1
+	lb $t3,($t2) #aggiorno t3 per confronto
+	j minimo
+
+stampa:
+	la $a0,message_out
+	li $v0,4
+	syscall #stampo messaggio
+	la $t0,wVett
+	li $t1,0
+ciclo:
+	beq $t1,DIM,fine
+	li $v0,1
+	lw $a0,($t0)
+	syscall
+	
+	add $t1,$t1,1
+	add $t0,$t0,1
+	j ciclo
+
+fine: 
+	li $v0,10
+	syscall
+
+.end main

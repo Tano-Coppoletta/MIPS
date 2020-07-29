@@ -1,0 +1,25 @@
+.data
+	DIM=5
+	wVett: .word 5, 7, 3, 4, 3
+	wResult: .space 4
+.text
+.globl main
+main:
+	la $t0,wVett #indirizzo
+	li $t1,0 #accumulatore
+	li $t3,DIM #contatore
+ciclo:
+	lw $t2,($t0)
+	add $t1,$t1,$t2
+	sub $t3,$t3,1
+	add $t0,$t0,4
+	beq $t3,0,fine
+	j ciclo
+	
+fine: 
+	sw $t1,wResult
+	
+	li $v0,10
+	syscall
+
+.end main

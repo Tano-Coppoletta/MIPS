@@ -1,0 +1,48 @@
+.data
+	DIM=4
+	wVett: .space 20
+	message_in: .asciiz "inserire numeri\n"
+	message_out: .asciiz "numeri inseriti\n"
+	space: .asciiz ";"
+.text
+.globl main
+main:
+	la $a0,message_in
+	li $v0,4
+	syscall #stampo stringa
+	
+	li $t1,0
+	la $t0,wVett
+uno :
+	li $v0,5
+	syscall
+	sw $v0,($t0)
+	beq $t1,DIM,print_num
+	add $t0,$t0,4
+	add $t1,$t1,1
+	j uno
+	
+print_num :
+	la $a0,message_out
+	li $v0,4
+	syscall #stampo messaggio
+	la $t0,wVett
+	li $t1,0
+ciclo_print: 
+	li $v0,1
+	lw $a0,($t0)
+	syscall
+	beq $t1,DIM,fine
+	la $a0,space
+	li $v0,4
+	syscall
+	
+	add $t1,$t1,1
+	add $t0,$t0,4
+	j ciclo_print
+
+fine: 
+	li $v0,10
+	syscall
+
+.end main
