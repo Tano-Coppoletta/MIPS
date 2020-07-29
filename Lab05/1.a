@@ -1,0 +1,36 @@
+#esercizio 5.1
+.data
+	var: .word 3141592653
+.text
+.globl main
+.ent main
+main:
+	lw $a0,var
+	li $v0,1
+	syscall
+	
+	li $t0,0 #contatore
+	li $t1,10 #costante
+	lw $t2,var
+ciclo1:
+	subu $sp,$sp,4 #aumento stack
+	divu $t2,$t1
+	mfhi $t2
+	sw $t2,($sp)
+	mflo $t2
+	addi $t0,$t0,1
+	bne $t2,$0,ciclo1
+	li $v0,11
+	li $a0,'\n'
+	syscall
+ciclo2:
+	lw $t2,($sp)
+	addu $sp,$sp,4
+	addi $t0,$t0,-1
+	add $t2,$t2,'0'
+	li $v0,11
+	la $a0,($t2)
+	syscall
+	bne $t0,$0,ciclo2
+	li $v0,10
+	syscall

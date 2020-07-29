@@ -1,0 +1,37 @@
+#esercizio 5.3
+.data
+	a: .word 1
+	ba: .word 0
+	c: .word 1
+	reali: .asciiz "ammette sol reali\n"
+	impossibile: .asciiz "impossibile"
+	coincidenti: .asciiz "soluzioni coincidenti"
+.text
+.globl main
+.ent main
+main:
+	lw $t0,a
+	lw $t1,ba
+	lw $t2,c
+	mul $t1,$t1,$t1 #b^2
+	mul $t0,$t0,$t2 #ac
+	sll $t0,$t0,2 #4ac
+	sub $t0,$t1,$t0
+	beq $t0,$0,zero
+	slt $t1,$t0,$0
+	bne $t1,$0,imp
+	la $a0,reali
+	j fine
+zero:
+	la $a0,coincidenti
+	j fine
+imp:
+	la $a0,impossibile
+fine:
+	li $v0,4
+	syscall
+	li $v0,10
+	syscall
+.end main
+	
+	

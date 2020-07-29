@@ -1,0 +1,44 @@
+#esercizio 5.2
+.data
+	start: .asciiz "inserire stringa\n"
+	palindroma: .asciiz "palindroma\n"
+	nonpalindroma: .asciiz "non palindroma\n"
+	vuoto: .asciiz "stringa vuota"
+.text
+.globl main
+.ent main
+main:
+	li $v0,4
+	la $a0,start
+	syscall
+	la $t0,($sp) #salvo l'indirizzo dello stack all'inizio
+lettura:
+	li $v0,12
+	syscall
+	beq $v0,'\n',fineinput
+	subu $sp,$sp,4	#amplio stack
+	sw $v0,($sp)	#inserisco nello stack
+	j lettura
+
+fineinput:
+	subu $t0,$t0,4
+	lw $t2,($t0)
+	lw $t3,($sp)
+	bne $t2,$t3,nopalind
+	addi $sp,$sp,4
+	ble $t0,$sp,palind
+	j fineinput
+nopalind:
+	la $a0,nonpalindroma
+	j fine
+palind:
+	la $a0,palindroma
+fine:
+	li $v0,4
+	syscall
+	li $v0,10
+	syscall
+.end main
+	
+	
+	
