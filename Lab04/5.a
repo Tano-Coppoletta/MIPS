@@ -1,0 +1,58 @@
+#esercizio 4.5
+.data
+	NUM_ELEM=6
+	DIM=4*NUM_ELEM
+	mat: .word 154, 123, 109, 86, 4, 0, 412, -23, -231, 9, 50, 0, 123, -24, 12, 55, -45, 0, 0, 0, 0, 0, 0, 0
+.text
+.globl main
+.ent main
+main:
+	li $t0,0 #contatore riga
+	li $t3,0 #contatore mat
+	li $t4,0 #accumulatore
+ciclorig:
+	beq $t0,3,finerig
+	li $t1,0 #contatore colonna
+ciclocol:
+	beq $t1,5,scrivi
+	lw $t2,mat($t3)
+	addi $t3,$t3,4
+	add $t4,$t4,$t2 #sommo
+	addi $t1,$t1,1
+	b ciclocol
+scrivi:
+	sw $t4,mat($t3)
+	addi $t3,$t3,4
+	li $t4,0
+	addi $t0,$t0,1
+	b ciclorig
+finerig:
+	li $t0,0 #contatore colonna
+	li $t3,0 #contatore mat
+ciclocolonna:
+	beq $t0,6,finecolonna
+	li $t1,0 #contatore riga
+	li $t4,0 #accumulatore
+cicloriga:
+	beq $t1,3,scriviriga
+	lw $t2,mat($t3)
+	addi $t3,$t3,24
+	add $t4,$t4,$t2 #sommo
+	addi $t1,$t1,1
+	b cicloriga
+scriviriga:
+	sw $t4,mat($t3)
+	addi $t0,$t0,1
+	sub $t3,$t3,68
+	b ciclocolonna
+finecolonna:
+	li $v0,10
+	syscall
+.end main
+	
+	
+	li $v0,10
+	syscall
+.end main
+	
+	

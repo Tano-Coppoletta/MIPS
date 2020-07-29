@@ -1,0 +1,31 @@
+#esercizio 4.3
+.data
+	NUM_ELEM=4
+	DIM=4*NUM_ELEM
+	vrig : .word 1, 2, 3, 4
+	vcol : .word 1, 2, 3, 4
+	res : .space DIM*NUM_ELEM
+.text
+.globl main
+.ent main
+main:
+	li $t0,0 #contatore i
+	li $t1,0 #contatore j
+	li $t5,0 #contatore matrice
+ciclo_est:
+	beq $t0,DIM,fine
+	lw $t2,vrig($t0) #carico elemento
+	addi $t0,$t0,4 #incremento i
+	li $t1,0 #riinizializzo j
+ciclo_int:
+	beq $t1,DIM,ciclo_est
+	lw $t3,vcol($t1) #carico elemento
+	addi $t1,$t1,4 #incremento j
+	mul $t4,$t3,$t2
+	sw $t4,res($t5)
+	addi $t5,$t5,4
+	b ciclo_int
+fine:
+ li $v0,10
+ syscall
+ .end main

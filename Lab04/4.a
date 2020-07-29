@@ -1,0 +1,28 @@
+#esercizio 4.4
+.data
+	DIM=10
+	pitagora: .space 100
+.text
+.globl main
+.ent main
+main:
+	la $t0,pitagora
+	li $t1,1 #contatore righe
+	li $t4,0 #contatore matrice
+ciclorig: 
+	beq $t1,11,finei
+	li $t2,1 #contatore colonne
+ciclocol:
+	beq $t2,11,finej
+	multu $t1,$t2
+	mflo $t3
+	sb $t3,pitagora($t4)
+	addi $t4,$t4,1
+	addi $t2,$t2,1
+	j ciclocol
+finej:
+	addi $t1,$t1,1
+	j ciclorig
+finei:
+	li $v0,10
+	syscall

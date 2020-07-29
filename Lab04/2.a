@@ -1,0 +1,47 @@
+#esercizio 4.2
+.data
+	opa: .word 2043
+	opb: .word 5
+	res: .space 4
+	tab: .word somma,sottrazione,moltiplic,divisione
+	messagein: .asciiz "inserire 0 per somma,1 sottrazione,2 moltiplic, 3 divisione"
+.text
+.globl main
+.ent main
+main:
+	lw $t0,opa
+	lw $t1,opb
+	la $a0,messagein
+	li $v0,4
+	syscall
+	li $v0,5
+	syscall
+	#se <0 o >3 errore e chiudo
+	blt $v0,0,errore
+	bgt $v0,3,errore
+	#moltiplico il numero inserito per 4 per trovare la pos nel vettore
+	sll $t2,$v0,2
+	lw $t2,tab($t2)
+	jr $t2
+
+somma:
+	add $t0,$t0,$t1
+	b fine	
+sottrazione:
+	sub $t0,$t0,$t1
+	b fine
+moltiplic:
+	mul $t0,$t0,$t1
+	b fine
+divisione:
+	div $t0,$t0,$t1
+	b fine
+
+errore:
+	b fine2
+fine: 
+	sw $t0,res
+fine2: 
+	li $v0,10
+	syscall
+.end main
