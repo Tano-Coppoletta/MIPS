@@ -1,0 +1,47 @@
+#esercizio 2
+.data
+    message: .asciiz "Inserisci un numero : "
+	err_mess: .asciiz "inserire valori tra -127 e 128"
+.text 
+.globl main
+main:
+	la $a0,message
+	li $v0,4
+	syscall
+	
+	li $v0,5
+	syscall
+	li $t1,0xFFFFFF00 #tutti 1 tranne il primo byte
+	and $t0,$v0,$t1 
+bne $t0,0,errore 
+	
+	la $a0,message
+	li $v0,4
+	syscall
+	
+	li $v0,5
+	syscall 
+	and $t1,$v0,$t1 #fine acquisizione
+bne $t1,0,errore
+	not $t3,$t1 #not b
+	and $t3,$t3,$t0 #a and(not b)
+	not $t3,$t3
+	xor $t0,$t0,$t1
+	or $t0,$t0,$t3
+	#fine espressione
+	
+	li $t1,0x000000FF
+	and $t0,$t0,$t1
+	move $a0,$t0
+	li $v0,1
+	syscall
+	j fine
+	
+errore:
+		li $v0,4
+		la $a0,err_mess
+		syscall
+fine:
+	li $v0,10
+	syscall
+	

@@ -1,0 +1,23 @@
+#esercizio 4
+.data
+	num: .half 22
+.text
+.globl main
+.ent main
+main:
+	lh $t0,num
+	and $t3,$0,$0 #azzeramento risultato
+	and $t4,$0,$0 #azzeramento indice
+	li $t1,1
+ciclo: 
+	and $t2,$t0,$t1
+	beq $t2,0,next
+	addi $t3,$t3,1
+next:
+	sll $t1,$t1,1
+	addi $t4,$t4,1
+	bne $t4,16,ciclo #se arrivo a 16 esco dal ciclo
+
+	
+	
+	
